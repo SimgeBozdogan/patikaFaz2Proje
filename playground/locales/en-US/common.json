@@ -1,5 +1,14 @@
 {
-  "Official state name": "Official state name",
+  "Admin Response": "Admin Response",
+  "Application Status": "Application Status",
+  "Create Date": "Create Date",
+  "Application Code": "Application Code",
+  "Attachment": "Attachment",
+  "Surname": "Surname",
+  "TC No": "ID Number",
+  "Reason For Application": "Reason For Application",
+  "Age": "Age",
+  "Address": "Address",
   "Sample add": "Sample add",
   "Sample edit": "Sample edit",
   "Sample text": "Sample text"

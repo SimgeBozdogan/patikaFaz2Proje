@@ -1,5 +1,14 @@
 {
-  "Official state name": "Resmi devlet adı",
+  "Admin Response": "Admin cevabı",
+  "Application Status": "Başvuru durumu",
+  "Create Date": "Başvuru Tarihi",
+  "Application Code": "Başvuru Kodu",
+  "Attachment": "Dosya eki",
+  "Surname": "Soyad",
+  "TC No": "TC Kimlik numarası",
+  "Reason For Application": "Başvuru nedeni",
+  "Age": "Yaş",
+  "Address": "Adres",
   "Sample add": "Örnek ekle",
   "Sample edit": "Örnek düzenle",
   "Sample text": "Örnek metin"
