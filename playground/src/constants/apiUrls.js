@@ -5,4 +5,8 @@ const apiUrls = {
   MetaDataCountriesById: 'MetaData/Countries/{0}',
 };
 
-export { apiUrls };
+const fullUrls = {
+  Applications: 'https://659318f3bb12970719905d89.mockapi.io/api/v1/applications/',
+};
+
+export { apiUrls, fullUrls };

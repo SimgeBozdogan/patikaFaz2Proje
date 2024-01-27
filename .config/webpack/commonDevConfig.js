@@ -1,6 +1,5 @@
 var modules = require('../modules');
 
-
 module.exports = function (moduleName, env) {
   const portNumber = modules[moduleName].port;
   return {
@@ -8,7 +7,7 @@ module.exports = function (moduleName, env) {
     devtool: 'cheap-module-source-map',
     output: {
       filename: '[name].[contenthash].js',
-      publicPath: `${process.env.WEB_DOMAIN || ''}/web/${moduleName}/`
+      publicPath: `${process.env.WEB_DOMAIN || ''}/web/${moduleName}/`,
     },
     module: {
       // noParse: (content) => { console.log(content); },
@@ -31,16 +30,16 @@ module.exports = function (moduleName, env) {
         {
           test: /\.bpmn|\.dmn$/,
           use: {
-            loader: 'raw-loader'
-          }
+            loader: 'raw-loader',
+          },
         },
         {
           test: /\.bpmnlintrc$/,
           use: [
             {
               loader: 'bpmnlint-loader',
-            }
-          ]
+            },
+          ],
         },
         {
           test: /\.scss|\.css$/,
@@ -53,13 +52,27 @@ module.exports = function (moduleName, env) {
               loader: 'file-loader',
               options: {
                 name: '[name].[ext]',
-                outputPath: 'fonts/'
-              }
-            }
-          ]
+                outputPath: 'fonts/',
+              },
+            },
+          ],
         },
         {
-          test: [/\.wexbim$/, /\.jpg$/, /\.docx$/, /\.csv$/, /\.mp4$/, /\.xlsx$/, /\.doc$/, /\.avi$/, /\.webm$/, /\.mov$/, /\.mp3$/, /\.rtf$/, /\.pdf$/],
+          test: [
+            /\.wexbim$/,
+            /\.jpg$/,
+            /\.docx$/,
+            /\.csv$/,
+            /\.mp4$/,
+            /\.xlsx$/,
+            /\.doc$/,
+            /\.avi$/,
+            /\.webm$/,
+            /\.mov$/,
+            /\.mp3$/,
+            /\.rtf$/,
+            /\.pdf$/,
+          ],
           loader: 'file-loader',
         },
         {

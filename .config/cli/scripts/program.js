@@ -188,7 +188,6 @@ program
         // after download completed close filestream
         file.on('finish', () => {
           file.close();
-          console.log('Download Completed');
           resolve();
         });
       });

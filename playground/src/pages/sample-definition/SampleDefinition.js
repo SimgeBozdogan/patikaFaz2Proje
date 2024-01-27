@@ -1,26 +1,9 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 
-import {
-  useAuthenticationContext,
-  useFiProxy,
-  useSnackbar,
-  useTranslation,
-  useTransactionContext,
-  scopeKeys,
-  stringFormat
-} from 'component/base';
-import {
-  BasePage,
-  Card,
-  Checkbox,
-  Input,
-  Select,
-  SelectEnum,
-  DatePicker,
-  withFormPage,
-} from 'component/ui';
+import { useAuthenticationContext, useFiProxy, useSnackbar, useTranslation, scopeKeys } from 'component/base';
+import { BasePage, Card, Input, withFormPage } from 'component/ui';
 
-import { apiUrls } from '../../constants';
+import { fullUrls } from '../../constants';
 
 /**
  * UI unique identifier meta-data.
@@ -38,91 +21,56 @@ const SampleDefinition = ({ close, isBpm, Id, ...rest }) => {
   const [dataModel, setDataModel] = useState({});
 
   const nameRef = useRef();
-  const codeRef = useRef();
-  const descriptionRef = useRef();
-  const isActiveRef = useRef(false);
+  const surnameRef = useRef();
+  const ageRef = useRef();
+  const tcNoRef = useRef();
+  const reasonForApplicationRef = useRef();
+  const adressRef = useRef();
 
   const { executeGet, executePost, executePut } = useFiProxy();
 
   useEffect(() => {
-    Id && getSampleData(Id);
+    rest.data && getSampleData(rest.data.id);
   }, []);
 
-  const filledState = (dataContract) => {
-    if (dataContract) {
-      setDataModel(dataContract);
-    }
-  };
-
   const getSampleData = (Id) => {
-    // executeGet({
-    //   url: stringFormat(apiUrls.TestDefinitionsByIdApi, Id),
-    //   baseURL: 'http://localhost:10047/'
-    // }).then((response) => {
-    //   if (response.Success) {
-    //     filledState(response.Value);
-    //   }
-    // });
-
-    executeGet({ url: stringFormat(apiUrls.MetaDataCountriesById, Id) }).then((response) => {
-      if (response.Value) {
-        setDataModel(response.Value);
+    executeGet({ fullURL: fullUrls.Applications + Id, enqueueSnackbarOnError: false }).then((response) => {
+      if (response) {
+        setDataModel(response);
       }
     });
   };
 
-  const onValueChanged = (field, value) => {
-    setDataModel({ ...dataModel, [field]: value });
-  };
-
   const onActionClick = (action) => {
+    const data = {
+      ...dataModel,
+      name: nameRef.current.value,
+      surname: surnameRef.current.value,
+      age: ageRef.current.value,
+      tcNo: tcNoRef.current.value,
+      reasonForApplication: reasonForApplicationRef.current.value,
+      adress: adressRef.current.value,
+    };
+
     if (action.commandName === 'Save') {
-      if (Id > 0) {
+      if (rest.data) {
         executePut({
-          url: apiUrls.Api + Id,
-          data: {
-            ...dataModel,
-            Name: nameRef.current.value,
-            Code: codeRef.current.value,
-            Description: descriptionRef.current.value,
-            IsActive:
-              isActiveRef.current && isActiveRef.current.value ? true : false,
-            BeginDate: dataModel.BeginDate,
-            EndDate: dataModel.EndDate,
-          },
+          fullURL: fullUrls.Applications + rest.data.id,
+          data,
         }).then((response) => {
-          if (response.Success) {
+          if (response) {
             close();
           }
         });
       } else {
-        const data = {
-          ...dataModel,
-          Name: nameRef.current.value,
-          Code: codeRef.current.value,
-          Description: descriptionRef.current.value,
-          IsActive: isActiveRef.current.value ? true : false,
-          BeginDate: dataModel.BeginDate,
-          EndDate: dataModel.EndDate,
-        };
-        close(data);
-        // executePost({
-        //   url: apiUrls.TestDefinitionsApi,
-        //   baseURL: 'http://localhost:10047/',
-        //   data: {
-        //     ...dataModel,
-        //     Name: nameRef.current.value,
-        //     Code: codeRef.current.value,
-        //     Description: descriptionRef.current.value,
-        //     IsActive: isActiveRef.current.value ? true : false,
-        //     BeginDate: dataModel.BeginDate,
-        //     EndDate: dataModel.EndDate,
-        //   },
-        // }).then((response) => {
-        //   if (response.Success) {
-        //     close(true);
-        //   }
-        // });
+        executePost({
+          fullURL: fullUrls.Applications,
+          data,
+        }).then((response) => {
+          if (response) {
+            close(data);
+          }
+        });
       }
     } else if (action.commandName == 'Cancel') {
       close && close(false);
@@ -133,74 +81,30 @@ const SampleDefinition = ({ close, isBpm, Id, ...rest }) => {
     <BasePage
       {...rest}
       onActionClick={onActionClick}
-      actionList={[
-        { name: 'Cancel' },
-        { name: 'Save', scopeKey: scopeKeys.Create_Loan },
-      ]}
+      actionList={[{ name: 'Cancel' }, { name: 'Save', scopeKey: scopeKeys.Create_Loan }]}
     >
       <Card scopeKey={scopeKeys.Create_Loan}>
+        <Input xs={6} required ref={nameRef} label={translate('Name')} value={dataModel.name} />
+        <Input xs={6} required ref={surnameRef} label={translate('Surname')} value={dataModel.surname} />
+        <Input xs={6} required ref={ageRef} label={translate('Age')} value={dataModel.age} type="number" minValue="1" />
         <Input
           xs={6}
           required
-          ref={nameRef}
-          label={translate('Name')}
-          value={dataModel.Name}
+          ref={tcNoRef}
+          label={translate('TC No')}
+          value={dataModel.tcNo}
+          minLength="11"
+          maxLength="11"
+          type="number"
         />
         <Input
           xs={6}
           required
-          ref={codeRef}
-          label={translate('Code')}
-          value={dataModel.Name}
+          ref={reasonForApplicationRef}
+          label={translate('Reason For Application')}
+          value={dataModel.reasonForApplication}
         />
-        <SelectEnum
-          xs={6}
-          name="Category"
-          label={translate('Category')}
-          enumName={'CategoryType'}
-          columns={['Name']}
-          valuePath={'Code'}
-          value={dataModel.Category}
-        />
-        <Select
-          xs={6}
-          name="City"
-          label={translate('City')}
-          datasource={[
-            { name: 'City 1', code: 1 },
-            { name: 'City 2', code: 2 },
-            { name: 'City 3', code: 3 },
-          ]}
-          onChange={(value) => onValueChanged('City', value)}
-          columns={['name']}
-          valuePath={'code'}
-          value={dataModel.Category}
-        />
-        <DatePicker
-          xs={6}
-          name="BeginDate"
-          label={translate('Begin date')}
-          value={dataModel.BeginDate}
-          onChange={(value) => onValueChanged('BeginDate', value)}
-          views={['year', 'month', 'day']}
-        />
-        <DatePicker
-          xs={6}
-          name="EndDate"
-          label={translate('End date')}
-          value={dataModel.EndDate}
-          onChange={(value) => onValueChanged('EndDate', value)}
-          views={['year', 'month', 'day']}
-        />
-        <Checkbox xs={6} ref={isActiveRef} label={translate('Is active')} />
-        <Input
-          xs={12}
-          required
-          ref={descriptionRef}
-          rows={3}
-          multiline
-          label={translate('Description')}
-        />
+        <Input xs={6} required ref={adressRef} label={translate('Address')} value={dataModel.adress} />
       </Card>
     </BasePage>
   );
