@@ -5,6 +5,7 @@
   "Application Code": "Application Code",
   "Surname": "Surname",
   "TC No": "ID Number",
+  "Tc No Helper Text": "Must be 11 characters",
   "Reason For Application": "Reason For Application",
   "Age": "Age",
   "Address": "Address",

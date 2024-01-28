@@ -1,19 +1,9 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 
-import {
-  useAuthenticationContext,
-  useFiProxy,
-  useFormManagerContext,
-  useSnackbar,
-  useTranslation,
-  scopeKeys,
-  stringFormat,
-  isNullOrEmpty,
-} from 'component/base';
+import { useFiProxy, useFormManagerContext, useTranslation, scopeKeys } from 'component/base';
 import { Card, DataGrid, Filter, Input, BasePage, withFormPage } from 'component/ui';
-
 import SampleDefinition from '../sample-definition';
-import { apiUrls, fullUrls } from '../../constants';
+import { fullUrls } from '../../constants';
 
 /**
  * UI unique identifier meta-data.
@@ -24,12 +14,9 @@ const uiMetadata = {
 };
 
 const SampleList = (props) => {
-  const { enqueueSnackbar } = useSnackbar();
-  const { tenant } = useAuthenticationContext();
   const { showDialog } = useFormManagerContext();
   const [dataSource, setDataSource] = useState([]);
   const { translate } = useTranslation();
-
   const { executeGet, executeDelete } = useFiProxy();
 
   useEffect(() => {
@@ -37,19 +24,11 @@ const SampleList = (props) => {
   }, []);
 
   const getDataSource = (data) => {
-    if (!isNullOrEmpty(data?.Id)) {
-      executeGet({ fullURL: fullUrls.Applications + data.id, enqueueSnackbarOnError: false }).then((response) => {
-        if (response.Value) {
-          setDataSource([response.Value]);
-        }
-      });
-    } else {
-      executeGet({ fullURL: fullUrls.Applications, enqueueSnackbarOnError: false }).then((response) => {
-        if (response) {
-          setDataSource(Object.values(response));
-        }
-      });
-    }
+    executeGet({ fullURL: fullUrls.Applications, enqueueSnackbarOnError: false }).then((response) => {
+      if (response) {
+        setDataSource(Object.values(response));
+      }
+    });
   };
 
   const deleteData = (id) => {
@@ -137,9 +116,6 @@ const SampleList = (props) => {
 
   return (
     <BasePage {...props} onActionClick={onActionClick}>
-      <Filter onFilter={(data) => getDataSource(data)}>
-        <Input name={'Id'} label={translate('Id')} primaryFilter />
-      </Filter>
       <Card scopeKey={scopeKeys.View_Loan} showHeader={true} actionList={cardActionList}>
         <DataGrid
           dataSource={dataSource}

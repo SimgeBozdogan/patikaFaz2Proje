@@ -5,6 +5,7 @@
   "Application Code": "رمز الطلب",
   "Surname": "اللقب",
   "TC No": "رقم الهوية",
+  "Tc No Helper Text": "يجب أن يكون 11 حرفا",
   "Reason For Application": "سبب الطلب",
   "Age": "العمر",
   "Address": "العنوان",

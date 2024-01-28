@@ -5,6 +5,7 @@
   "Application Code": "Başvuru Kodu",
   "Surname": "Soyad",
   "TC No": "TC Kimlik numarası",
+  "Tc No Helper Text": "11 karakter olmalıdır",
   "Reason For Application": "Başvuru nedeni",
   "Age": "Yaş",
   "Address": "Adres",

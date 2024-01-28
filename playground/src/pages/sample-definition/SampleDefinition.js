@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useAuthenticationContext, useFiProxy, useSnackbar, useTranslation, scopeKeys } from 'component/base';
-import { BasePage, Card, Input, withFormPage } from 'component/ui';
+import { useFiProxy, useTranslation, scopeKeys } from 'component/base';
+import { BasePage, Card, Input, Select, withFormPage } from 'component/ui';
 import { fullUrls } from '../../constants';
 import { generateUIKey } from '../../../../.config/utils';
 import { applicationStatus } from '../../constants';
@@ -15,10 +15,11 @@ const uiMetadata = {
 
 const SampleDefinition = ({ close, isBpm, Id, ...rest }) => {
   const { translate } = useTranslation();
-  const { tenant, user } = useAuthenticationContext();
-  const { enqueueSnackbar } = useSnackbar();
-
   const [dataModel, setDataModel] = useState({});
+  const [isUpdatePage, setUpdatePage] = useState(false);
+  const [tcNoHelperText, setTcNoHelperText] = useState('');
+
+  const { executeGet, executePost, executePut } = useFiProxy();
 
   const nameRef = useRef();
   const surnameRef = useRef();
@@ -26,10 +27,10 @@ const SampleDefinition = ({ close, isBpm, Id, ...rest }) => {
   const tcNoRef = useRef();
   const reasonForApplicationRef = useRef();
   const adressRef = useRef();
-
-  const { executeGet, executePost, executePut } = useFiProxy();
+  const adminResponseRef = useRef();
 
   useEffect(() => {
+    setUpdatePage(Boolean(rest.data));
     rest.data && getSampleData(rest.data.id);
   }, []);
 
@@ -42,22 +43,28 @@ const SampleDefinition = ({ close, isBpm, Id, ...rest }) => {
   };
 
   const onActionClick = (action) => {
-    const applicationCode = generateUIKey();
-
-    const data = {
-      ...dataModel,
-      name: nameRef.current.value,
-      surname: surnameRef.current.value,
-      age: ageRef.current.value,
-      tcNo: tcNoRef.current.value,
-      reasonForApplication: reasonForApplicationRef.current.value,
-      adress: adressRef.current.value,
-      applicationCode,
-      applicationStatus: applicationStatus.PENDING,
-    };
-
     if (action.commandName === 'Save') {
-      if (rest.data) {
+      if (tcNoRef.current.value.length !== 11) {
+        setTcNoHelperText(translate('Tc No Helper Text'));
+        return;
+      }
+
+      const commonData = {
+        ...dataModel,
+        name: nameRef.current.value,
+        surname: surnameRef.current.value,
+        age: ageRef.current.value,
+        tcNo: tcNoRef.current.value,
+        reasonForApplication: reasonForApplicationRef.current.value,
+        adress: adressRef.current.value,
+      };
+
+      if (isUpdatePage) {
+        const data = {
+          ...commonData,
+          adminResponse: adminResponseRef.current.value,
+        };
+
         executePut({
           fullURL: fullUrls.Applications + rest.data.id,
           data,
@@ -68,6 +75,14 @@ const SampleDefinition = ({ close, isBpm, Id, ...rest }) => {
           }
         });
       } else {
+        const applicationCode = generateUIKey();
+        const data = {
+          ...commonData,
+          applicationCode,
+          applicationStatus: applicationStatus.PENDING,
+          adminResponse: '',
+        };
+
         executePost({
           fullURL: fullUrls.Applications,
           data,
@@ -81,6 +96,19 @@ const SampleDefinition = ({ close, isBpm, Id, ...rest }) => {
     } else if (action.commandName == 'Cancel') {
       close && close(false);
     }
+  };
+
+  const onValueChanged = (field, value) => {
+    setDataModel({ ...dataModel, [field]: value });
+  };
+
+  const getApplicationStatusSelectOptions = () => {
+    const outputArray = Object.entries(applicationStatus).map(([key, value], index) => ({
+      name: value,
+      code: index + 1,
+    }));
+
+    return outputArray;
   };
 
   return (
@@ -108,9 +136,8 @@ const SampleDefinition = ({ close, isBpm, Id, ...rest }) => {
           ref={tcNoRef}
           label={translate('TC No')}
           value={dataModel.tcNo}
-          minLength="11"
-          maxLength="11"
           type="number"
+          helperText={tcNoHelperText}
         />
         <Input
           xs={6}
@@ -120,6 +147,26 @@ const SampleDefinition = ({ close, isBpm, Id, ...rest }) => {
           value={dataModel.reasonForApplication}
         />
         <Input xs={6} required ref={adressRef} label={translate('Address')} value={dataModel.adress} />
+        {isUpdatePage && (
+          <>
+            <Select
+              name="applicationStatus"
+              style={{ marginBottom: '1rem' }}
+              label={translate('Application Status')}
+              datasource={getApplicationStatusSelectOptions()}
+              onChange={(value) => onValueChanged('applicationStatus', value)}
+              columns={['name']}
+              valuePath={'name'}
+              value={dataModel.applicationStatus}
+            />
+            <Input
+              ref={adminResponseRef}
+              label={translate('Admin Response')}
+              value={dataModel.adminResponse}
+              multiline
+            />
+          </>
+        )}
       </Card>
     </BasePage>
   );
