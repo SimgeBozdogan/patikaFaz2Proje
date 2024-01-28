@@ -147,6 +147,7 @@ const SampleList = (props) => {
           actionList={gridActionList}
           autoSizeAllColumns
           idProperty="id"
+          enableFiltering={true}
         />
       </Card>
     </BasePage>
