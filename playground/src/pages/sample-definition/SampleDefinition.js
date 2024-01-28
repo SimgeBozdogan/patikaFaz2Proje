@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
-
+import React, { useEffect, useRef, useState } from 'react';
 import { useAuthenticationContext, useFiProxy, useSnackbar, useTranslation, scopeKeys } from 'component/base';
 import { BasePage, Card, Input, withFormPage } from 'component/ui';
-
 import { fullUrls } from '../../constants';
+import { generateUIKey } from '../../../../.config/utils';
+import { applicationStatus } from '../../constants';
 
 /**
  * UI unique identifier meta-data.
@@ -42,6 +42,8 @@ const SampleDefinition = ({ close, isBpm, Id, ...rest }) => {
   };
 
   const onActionClick = (action) => {
+    const applicationCode = generateUIKey();
+
     const data = {
       ...dataModel,
       name: nameRef.current.value,
@@ -50,6 +52,8 @@ const SampleDefinition = ({ close, isBpm, Id, ...rest }) => {
       tcNo: tcNoRef.current.value,
       reasonForApplication: reasonForApplicationRef.current.value,
       adress: adressRef.current.value,
+      applicationCode,
+      applicationStatus: applicationStatus.PENDING,
     };
 
     if (action.commandName === 'Save') {
@@ -57,6 +61,7 @@ const SampleDefinition = ({ close, isBpm, Id, ...rest }) => {
         executePut({
           fullURL: fullUrls.Applications + rest.data.id,
           data,
+          enqueueSnackbarOnError: false,
         }).then((response) => {
           if (response) {
             close();
@@ -66,6 +71,7 @@ const SampleDefinition = ({ close, isBpm, Id, ...rest }) => {
         executePost({
           fullURL: fullUrls.Applications,
           data,
+          enqueueSnackbarOnError: false,
         }).then((response) => {
           if (response) {
             close(data);
@@ -86,7 +92,16 @@ const SampleDefinition = ({ close, isBpm, Id, ...rest }) => {
       <Card scopeKey={scopeKeys.Create_Loan}>
         <Input xs={6} required ref={nameRef} label={translate('Name')} value={dataModel.name} />
         <Input xs={6} required ref={surnameRef} label={translate('Surname')} value={dataModel.surname} />
-        <Input xs={6} required ref={ageRef} label={translate('Age')} value={dataModel.age} type="number" minValue="1" />
+        <Input
+          xs={6}
+          required
+          ref={ageRef}
+          label={translate('Age')}
+          value={dataModel.age}
+          type="number"
+          minValue="1"
+          maxValue="150"
+        />
         <Input
           xs={6}
           required
