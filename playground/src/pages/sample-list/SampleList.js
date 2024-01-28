@@ -38,7 +38,7 @@ const SampleList = (props) => {
 
   const getDataSource = (data) => {
     if (!isNullOrEmpty(data?.Id)) {
-      executeGet({ url: stringFormat(apiUrls.MetaDataCountriesById, data.Id) }).then((response) => {
+      executeGet({ fullURL: fullUrls.Applications + data.id, enqueueSnackbarOnError: false }).then((response) => {
         if (response.Value) {
           setDataSource([response.Value]);
         }
@@ -54,7 +54,7 @@ const SampleList = (props) => {
 
   const deleteData = (id) => {
     if (id) {
-      executeDelete({ fullURL: fullUrls.Applications + id }).then((response) => {
+      executeDelete({ fullURL: fullUrls.Applications + id, enqueueSnackbarOnError: false }).then((response) => {
         if (response) {
           getDataSource();
         }
@@ -82,7 +82,7 @@ const SampleList = (props) => {
 
   const addClicked = useCallback(() => {
     showDialog({
-      title: translate('Sample add'),
+      title: translate('Application add'),
       content: <SampleDefinition />,
       callback: (data) => {
         if (data) {
@@ -95,7 +95,7 @@ const SampleList = (props) => {
   const editClicked = useCallback((id, data) => {
     data &&
       showDialog({
-        title: translate('Sample edit'),
+        title: translate('Application edit'),
         content: <SampleDefinition data={data} />,
         callback: () => {
           getDataSource();
@@ -147,6 +147,7 @@ const SampleList = (props) => {
           actionList={gridActionList}
           autoSizeAllColumns
           idProperty="id"
+          enableFiltering={true}
         />
       </Card>
     </BasePage>
